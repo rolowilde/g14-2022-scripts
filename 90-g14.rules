@@ -1,0 +1,4 @@
+ACTION!="remove", SUBSYSTEM=="platform", KERNEL=="asus-nb-wmi", RUN+="/usr/bin/sh -c 'chmod a+w /sys/devices/platform/asus-nb-wmi/hwmon/hwmon7/pwm1_enable || true'"
+ACTION!="remove", SUBSYSTEM=="platform", KERNEL=="asus-nb-wmi", RUN+="/usr/bin/sh -c 'chmod a+w /sys/devices/platform/asus-nb-wmi/hwmon/hwmon7/pwm2_enable || true'"
+ACTION!="remove", SUBSYSTEM=="platform", KERNEL=="asus-nb-wmi", RUN+="/usr/bin/sh -c 'chmod a+w /sys/devices/platform/asus-nb-wmi/dgpu_disable || true'"
+ACTION!="remove", SUBSYSTEM=="firmware-attributes", KERNEL=="asus-armoury", RUN+="/usr/bin/chmod a+w /sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value"

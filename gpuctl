@@ -1,0 +1,53 @@
+#!/bin/sh
+
+DGPU_DISABLE_PATH=/sys/devices/platform/asus-nb-wmi/dgpu_disable
+if lsmod | grep -wq asus_armoury; then
+  DGPU_DISABLE_PATH=/sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
+fi
+
+if [ ! -f $DGPU_DISABLE_PATH ]; then
+  exit 1
+fi
+
+current="Hybrid"
+pending="Integrated"
+[ -z "$1" ] && dgpu_off=$(cat $DGPU_DISABLE_PATH) || dgpu_off=$1
+if [ "$dgpu_off" -eq 1 ]; then
+  current="Integrated"
+  pending="Hybrid"
+fi
+
+action=$(notify-send \
+  --urgency=critical \
+  --app-name "GPU Control" \
+  "Current mode is $current" \
+  "Change to $pending and Shutdown or Reboot?" \
+  --wait \
+  --action=s=Shutdown \
+  --action=r=Reboot)
+
+if [ "$action" = "s" ]; then
+  action="shutdown now"
+elif [ "$action" = "r" ]; then
+  action="shutdown -r now"
+else
+  exit 0
+fi
+
+if [ "$dgpu_off" -eq 0 ]; then
+  notify-send \
+    --urgency=critical \
+    --app-name "GPU Control" \
+    "Disabling discrete graphics..."
+  echo 1 >$DGPU_DISABLE_PATH
+else
+  notify-send \
+    --urgency=critical \
+    --app-name "GPU Control" \
+    "Enabling discrete graphics..."
+  echo 0 >$DGPU_DISABLE_PATH
+fi
+
+sleep 1
+
+$action

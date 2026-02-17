@@ -1,0 +1,30 @@
+#!/bin/sh
+
+WMI_PATH=/sys/devices/platform/asus-nb-wmi
+HWMON_PATH=$WMI_PATH/hwmon/hwmon7
+CPU_FAN_PWM_PATH=$HWMON_PATH/pwm1_enable
+GPU_FAN_PWM_PATH=$HWMON_PATH/pwm2_enable
+
+dgpu_disable=$(cat $WMI_PATH/dgpu_disable)
+profile=$(cat $WMI_PATH/platform-profile/platform-profile-0/profile)
+if [ ! -f $CPU_FAN_PWM_PATH ] ||
+  [ ! -f $GPU_FAN_PWM_PATH ] ||
+  [ ! "$dgpu_disable" -eq 0 ] ||
+  [ "$profile" = "low-power" ]; then
+  exit 1
+fi
+
+# wake dgpu for a few secs so that pwm2 is writable
+DRI_PRIME=1 glxinfo >/dev/null
+
+[ -z $1 ] && pwm1=$(cat $CPU_FAN_PWM_PATH) || pwm1=$1
+[ -z $1 ] && pwm2=$(cat $GPU_FAN_PWM_PATH) || pwm2=$1
+if [ "$pwm1" -eq 2 ] || [ "$pwm2" -eq 2 ]; then
+  # disable pwm -- max fan speed
+  echo 0 >$CPU_FAN_PWM_PATH
+  echo 0 >$GPU_FAN_PWM_PATH
+else
+  # enable pwm -- factory fan curve
+  echo 2 >$CPU_FAN_PWM_PATH
+  echo 2 >$GPU_FAN_PWM_PATH
+fi
