@@ -1,9 +1,9 @@
 #!/bin/sh
 
 DGPU_DISABLE_PATH=/sys/devices/platform/asus-nb-wmi/dgpu_disable
-if lsmod | grep -wq asus_armoury; then
-  DGPU_DISABLE_PATH=/sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
-fi
+#if lsmod | grep -wq asus_armoury; then
+#  DGPU_DISABLE_PATH=/sys/class/firmware-attributes/asus-armoury/attributes/dgpu_disable/current_value
+#fi
 
 if [ ! -f $DGPU_DISABLE_PATH ]; then
   exit 1
