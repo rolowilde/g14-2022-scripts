@@ -1,0 +1,13 @@
+#!/bin/sh
+PLATFORM_PROFILE_PATH=/sys/firmware/acpi/platform_profile
+CPU_PATH=/sys/devices/system/cpu
+
+echo performance >$PLATFORM_PROFILE_PATH
+echo 1 >$CPU_PATH/cpufreq/boost
+
+nproc=$(nproc); j=0
+while [ "$j" -lt "$nproc" ]; do
+    cpufreq=$CPU_PATH/cpu$j/cpufreq
+    echo performance >$cpufreq/energy_performance_preference
+    j=$((j + 1))
+done
